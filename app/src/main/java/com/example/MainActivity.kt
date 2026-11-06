@@ -243,9 +243,13 @@ fun PdfStudioScreen(
               modifier = Modifier.fillMaxSize().testTag("pdf_studio_webview"),
               factory = { context ->
                 WebView(context).apply {
+                  layoutParams =
+                      ViewGroup.LayoutParams(
+                          ViewGroup.LayoutParams.MATCH_PARENT,
+                          ViewGroup.LayoutParams.MATCH_PARENT)
                   webViewInstance = this
                   onWebViewReady(this)
-                  setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                  setBackgroundColor(android.graphics.Color.parseColor("#0F0E17"))
 
                   settings.apply {
                     javaScriptEnabled = true
@@ -260,6 +264,10 @@ fun PdfStudioScreen(
                     displayZoomControls = false
                     cacheMode = WebSettings.LOAD_DEFAULT
                     mediaPlaybackRequiresUserGesture = false
+                    @Suppress("DEPRECATION")
+                    allowFileAccessFromFileURLs = true
+                    @Suppress("DEPRECATION")
+                    allowUniversalAccessFromFileURLs = true
                   }
 
                   addJavascriptInterface(
@@ -315,7 +323,10 @@ fun PdfStudioScreen(
                         }
 
                         override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                          return super.onConsoleMessage(consoleMessage)
+                          Log.d(
+                              "PDFStudio_WebView",
+                              "${consoleMessage?.message()} [line ${consoleMessage?.lineNumber()}]")
+                          return true
                         }
                       }
 
@@ -326,7 +337,10 @@ fun PdfStudioScreen(
                             request: WebResourceRequest?
                         ): Boolean {
                           val url = request?.url?.toString() ?: return false
-                          if (url.startsWith("file:///android_asset/")) {
+                          if (url.startsWith("file://") ||
+                              url.startsWith("data:") ||
+                              url.startsWith("about:") ||
+                              url.startsWith("blob:")) {
                             return false
                           }
                           return try {

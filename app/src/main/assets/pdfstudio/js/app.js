@@ -211,14 +211,42 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Automatically load default sample invoice so user immediately has an active document
-  SampleDocs.createSampleInvoice().then(sampleBytes => {
-    window.pdfEditor.loadPdfBytes(sampleBytes, 'Sample_Invoice.pdf');
-  });
-
-  // Dismiss Splash Screen smoothly after initial load
-  setTimeout(() => {
+  // Function to dismiss splash screen safely
+  function dismissSplash() {
     const splash = document.getElementById('splash-screen');
-    if (splash) splash.classList.add('hidden');
-  }, 1000);
+    if (splash) {
+      splash.classList.add('hidden');
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 400);
+    }
+  }
+
+  // Dismiss splash screen immediately after initial layout
+  setTimeout(dismissSplash, 500);
+  window.addEventListener('load', dismissSplash);
+
+  // Automatically load default sample invoice so user immediately has an active document
+  try {
+    if (typeof SampleDocs !== 'undefined' && SampleDocs.createSampleInvoice) {
+      SampleDocs.createSampleInvoice().then(sampleBytes => {
+        if (window.pdfEditor) {
+          window.pdfEditor.loadPdfBytes(sampleBytes, 'Sample_Invoice.pdf');
+        }
+      }).catch(err => {
+        console.warn('Initial sample invoice load note:', err);
+      });
+    }
+  } catch (err) {
+    console.warn('Sample creation note:', err);
+  }
 });
+
+// Global failsafe: ensure splash is never stuck
+setTimeout(() => {
+  const splash = document.getElementById('splash-screen');
+  if (splash && splash.style.display !== 'none') {
+    splash.classList.add('hidden');
+    splash.style.display = 'none';
+  }
+}, 800);

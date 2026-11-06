@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>PDF Studio Ultimate</title>
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Failsafe auto-dismissal to guarantee the UI is never blocked by a black splash screen
+    setTimeout(function() {
+      var s = document.getElementById('splash-screen');
+      if (s) {
+        s.classList.add('hidden');
+        s.style.display = 'none';
+      }
+    }, 600);
+  </script>
 </head>
 <body>
 

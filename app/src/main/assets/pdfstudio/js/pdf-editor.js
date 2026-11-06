@@ -40,7 +40,9 @@ class PdfEditor {
 
     // PDF.js worker setup
     if (window.pdfjsLib) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      } catch (_) {}
     }
   }
 
@@ -55,17 +57,28 @@ class PdfEditor {
     this.undoStack = [];
     this.redoStack = [];
 
-    const loadingTask = pdfjsLib.getDocument({ data: this.rawBytes });
-    this.pdfDoc = await loadingTask.promise;
-    this.pageCount = this.pdfDoc.numPages;
-    this.currentPage = 1;
+    try {
+      if (window.pdfjsLib) {
+        const loadingTask = pdfjsLib.getDocument({
+          data: this.rawBytes,
+          isEvalSupported: false,
+          useWorkerFetch: false
+        });
+        this.pdfDoc = await loadingTask.promise;
+        this.pageCount = this.pdfDoc.numPages;
+        this.currentPage = 1;
 
-    for (let i = 1; i <= this.pageCount; i++) {
-      this.pageObjects[i] = [];
+        for (let i = 1; i <= this.pageCount; i++) {
+          this.pageObjects[i] = [];
+        }
+
+        await this.renderAllPages();
+        this.renderThumbnails();
+      }
+    } catch (err) {
+      console.warn('PDF.js rendering note:', err);
     }
 
-    await this.renderAllPages();
-    this.renderThumbnails();
     this.updateEditorUI();
     this.recordHistory('load');
   }
