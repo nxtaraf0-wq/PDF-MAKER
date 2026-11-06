@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PDF Studio Ultimate</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Animated Splash Screen -->
+  <div id="splash-screen">
+    <div class="splash-logo-box">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v3H6V7.5h3.5c1.1 0 2 .9 2 2s-.9 2-2 2zm7.5 5h-1.5v-2h-2v2H12V7.5h1.5v3.5h2V7.5H17v9zM7.5 9h2v1h-2V9z"/></svg>
+    </div>
+    <div class="splash-title">PDF STUDIO</div>
+    <div class="splash-tagline">Ultimate Offline Document Suite</div>
+    <div class="splash-spinner"></div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand-section" onclick="showView('home-view')">
+        <button class="btn-icon" id="nav-back-home" style="display:none;margin-right:6px;" title="Back to Dashboard">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v3H6V7.5h3.5c1.1 0 2 .9 2 2s-.9 2-2 2zm7.5 5h-1.5v-2h-2v2H12V7.5h1.5v3.5h2V7.5H17v9zM7.5 9h2v1h-2V9z"/></svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">PDF Studio</div>
+          <div class="brand-badge">ULTIMATE OFFLINE</div>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
+          <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+        </button>
+        <button class="btn-icon" onclick="PdfTools.toggleFullScreen()" title="Full Screen">
+          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="showView('editor-view')" id="open-editor-quick-btn">
+          Editor
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="window.pdfEditor.exportPdf()" id="export-doc-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Export PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Views Wrapper -->
+    <main class="views-wrapper">
+
+      <!-- 1. HOME DASHBOARD VIEW -->
+      <section class="view-panel active" id="home-view">
+        <div class="scroll-content">
+          
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <div class="hero-content">
+              <div class="hero-pill">Offline Pro Edition</div>
+              <h1 class="hero-title">All-in-One Professional PDF Workspace</h1>
+              <p class="hero-desc">
+                Edit text, shapes, and images directly in your browser. Convert, compress, scan, OCR, sign, and manage PDFs with zero data leaving your device.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-primary" onclick="triggerFilePicker('.pdf,application/pdf', files => { const r = new FileReader(); r.onload = e => { window.pdfEditor.loadPdfBytes(e.target.result, files[0].name); showView('editor-view'); saveRecentDoc(files[0].name, new Uint8Array(e.target.result)); }; r.readAsArrayBuffer(files[0]); })">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                  Open PDF
+                </button>
+                <button class="btn btn-secondary" onclick="SampleDocs.createBlankPdf().then(b => { window.pdfEditor.loadPdfBytes(b, 'New_Document.pdf'); showView('editor-view'); })">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  Create New PDF
+                </button>
+                <button class="btn btn-secondary" onclick="triggerCameraScan()">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm0-4.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                  Scan Document
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Templates Bar -->
+          <div class="section-header">
+            <h2 class="section-title">Ready Templates</h2>
+          </div>
+          <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;margin-bottom:28px;">
+            <button class="btn btn-secondary btn-sm" onclick="PdfTools.generateTemplate('invoice')">🧾 Commercial Invoice</button>
+            <button class="btn btn-secondary btn-sm" onclick="PdfTools.generateTemplate('contract')">📜 Legal Contract</button>
+            <button class="btn btn-secondary btn-sm" onclick="PdfTools.generateTemplate('resume')">💼 Modern Resume</button>
+            <button class="btn btn-secondary btn-sm" onclick="PdfTools.generateTemplate('certificate')">🏆 Award Certificate</button>
+          </div>
+
+          <!-- Tools Grid -->
+          <div class="section-header">
+            <h2 class="section-title">Studio Tools Suite</h2>
+          </div>
+          <div class="tools-grid">
+
+            <div class="tool-card" onclick="showView('editor-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #ff3366, #ff6b6b);">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">PDF Editor</div>
+                <div class="tool-desc">Text, shapes, images, drawings, stamps & sticky notes.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('converter-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #00d2fc, #4facfe);">
+                <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">PDF Converter</div>
+                <div class="tool-desc">Convert to JPG, PNG, DOCX, CSV Excel, & TXT.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('compressor-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #00e676, #00b0ff);">
+                <svg viewBox="0 0 24 24"><path d="M4 18h16v2H4zm14-5l-1.41-1.41L13 15.17V4h-2v11.17l-3.59-3.58L6 13l6 6 6-6z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">PDF Compressor</div>
+                <div class="tool-desc">Reduce PDF size with Low, Med & High compression.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="openSignatureModal()">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #9b51e0, #e056fd);">
+                <svg viewBox="0 0 24 24"><path d="M2.5 19.5h19v2h-19zm19-8l-8.5-8.5c-.78-.78-2.05-.78-2.83 0L3 10.17v5.33h5.33l7.17-7.17 1.41 1.41-8.58 8.59h-3.33v-1.33l9.17-9.17 2.83 2.83-8 8.01 1.41 1.41 8-8.01 2.83 2.83-1.41 1.41 1.41 1.41 2.26-2.25c.78-.78.78-2.05 0-2.83z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">Smart Signature</div>
+                <div class="tool-desc">Draw, upload, and save signatures locally.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('ocr-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #ffb300, #ff5722);">
+                <svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3zM3 3v4h2V5h2V3H3zm16 0v2h2v2h2V3h-4zM5 19v-2H3v4h4v-2H5zm16 0h-2v2h4v-4h-2v2z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">Local OCR Scanner</div>
+                <div class="tool-desc">Extract text from scanned pages & photos.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('assistant-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #6c5ce7, #a29bfe);">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">Offline Assistant</div>
+                <div class="tool-desc">Extractive summaries, keywords, stats & readability.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('translator-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #00b894, #55efc4);">
+                <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">PDF Translator</div>
+                <div class="tool-desc">Extract, translate, and recompile target PDFs.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('security-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #e17055, #fab1a0);">
+                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">Security & Watermark</div>
+                <div class="tool-desc">Password protect, add watermarks & sanitize meta.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="showView('compare-view')">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #0984e3, #74b9ff);">
+                <svg viewBox="0 0 24 24"><path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v2h2V1h-2v2zm-5 16V5h5v14H5zm14-16h-5v2h5v14h-5v2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">Compare PDFs</div>
+                <div class="tool-desc">Side-by-side text diff & visual page inspection.</div>
+              </div>
+            </div>
+
+            <div class="tool-card" onclick="openCodeModal()">
+              <div class="tool-icon-box" style="background:linear-gradient(135deg, #fd79a8, #e84393);">
+                <svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+              </div>
+              <div class="tool-info">
+                <div class="tool-name">QR & Barcode</div>
+                <div class="tool-desc">Generate QR codes & barcodes directly into PDF.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Recent Documents Section -->
+          <div class="section-header">
+            <h2 class="section-title">Recent Documents</h2>
+          </div>
+          <div class="recent-list" id="recent-docs-grid">
+            <!-- Populated via IndexedDB -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 2. ADVANCED PDF EDITOR VIEW -->
+      <section class="view-panel" id="editor-view">
+        
+        <!-- Editor Top Toolbar -->
+        <div class="editor-top-toolbar">
+          <div class="tool-group">
+            <button class="tool-btn active" data-tool="select" onclick="window.pdfEditor.setTool('select')" title="Select / Move">
+              <svg viewBox="0 0 24 24"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4L7 18.5V2z"/></svg>
+              Select
+            </button>
+            <button class="tool-btn" data-tool="text" onclick="window.pdfEditor.setTool('text')" title="Add Text">
+              <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
+              Text
+            </button>
+            <button class="tool-btn" data-tool="draw" onclick="window.pdfEditor.setTool('draw')" title="Pen Draw">
+              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+              Pen
+            </button>
+            <button class="tool-btn" data-tool="highlighter" onclick="window.pdfEditor.setTool('highlighter')" title="Highlighter">
+              <svg viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2v3h-4V4c0-1.1.9-2 2-2zm6 7H6v11c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9z"/></svg>
+              Highlight
+            </button>
+          </div>
+
+          <div class="tool-group">
+            <button class="tool-btn" data-tool="rect" onclick="window.pdfEditor.setTool('rect')" title="Rectangle">
+              <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5z"/></svg>
+              Rect
+            </button>
+            <button class="tool-btn" data-tool="circle" onclick="window.pdfEditor.setTool('circle')" title="Circle">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+              Circle
+            </button>
+            <button class="tool-btn" data-tool="arrow" onclick="window.pdfEditor.setTool('arrow')" title="Arrow">
+              <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+              Arrow
+            </button>
+            <button class="tool-btn" data-tool="eraser" onclick="window.pdfEditor.setTool('eraser')" title="Whiteout Eraser">
+              <svg viewBox="0 0 24 24"><path d="M15.14 3c-.41 0-.8.16-1.1.47l-11.57 11.6c-.61.6-.61 1.58 0 2.18l4.28 4.28c.3.3.69.47 1.1.47h8.15v-2H9.28L6.45 17.2l8-8 4.25 4.25 1.41-1.41L16.24 3.47c-.3-.31-.69-.47-1.1-.47z"/></svg>
+              Whiteout
+            </button>
+          </div>
+
+          <div class="tool-group">
+            <button class="tool-btn" onclick="openSignatureModal()" title="Insert Signature">
+              <svg viewBox="0 0 24 24"><path d="M2.5 19.5h19v2h-19zm19-8l-8.5-8.5c-.78-.78-2.05-.78-2.83 0L3 10.17v5.33h5.33l7.17-7.17 1.41 1.41-8.58 8.59h-3.33v-1.33l9.17-9.17 2.83 2.83-8 8.01 1.41 1.41 8-8.01 2.83 2.83-1.41 1.41 1.41 1.41 2.26-2.25c.78-.78.78-2.05 0-2.83z"/></svg>
+              Sign
+            </button>
+            <button class="tool-btn" onclick="openStampModal()" title="Stamp">
+              <svg viewBox="0 0 24 24"><path d="M19 19H5v-2h14v2zm-7-4c-2.76 0-5-2.24-5-5 0-.89.24-1.72.65-2.45L12 4.14l4.35 3.41c.41.73.65 1.56.65 2.45 0 2.76-2.24 5-5 5z"/></svg>
+              Stamp
+            </button>
+            <button class="tool-btn" onclick="triggerFilePicker('image/*', files => { const r = new FileReader(); r.onload = e => { const img = new Image(); img.onload = () => window.pdfEditor.insertImageElement(img); img.src = e.target.result; }; r.readAsDataURL(files[0]); })" title="Insert Image">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              Image
+            </button>
+            <button class="tool-btn" onclick="PdfTools.insertTable(3, 3)" title="Insert Table">
+              <svg viewBox="0 0 24 24"><path d="M4 3h16c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm0 4h16V5H4v2zm0 4h7v4H4v-4zm9 0h7v4h-7v-4zm-9 6h7v2H4v-2zm9 0h7v2h-7v-2z"/></svg>
+              Table
+            </button>
+          </div>
+
+          <div class="tool-group">
+            <button class="tool-btn" onclick="window.pdfEditor.undo()" title="Undo (Ctrl+Z)">
+              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+            </button>
+            <button class="tool-btn" onclick="window.pdfEditor.redo()" title="Redo (Ctrl+Y)">
+              <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+            </button>
+            <button class="tool-btn" onclick="window.pdfEditor.setZoom(window.pdfEditor.zoomScale - 0.15)" title="Zoom Out">−</button>
+            <span id="zoom-percentage" style="font-size:12px;font-weight:600;min-width:38px;text-align:center;">100%</span>
+            <button class="tool-btn" onclick="window.pdfEditor.setZoom(window.pdfEditor.zoomScale + 0.15)" title="Zoom In">+</button>
+          </div>
+        </div>
+
+        <div class="editor-layout">
+          
+          <!-- Left Sidebar (Thumbnails & Page Ops) -->
+          <aside class="editor-sidebar-left" id="editor-sidebar-left">
+            <div class="sidebar-tabs">
+              <button class="sidebar-tab-btn active">Pages</button>
+            </div>
+            <div style="padding:8px 12px;display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border-glass);">
+              <button class="btn btn-secondary btn-sm" style="flex:1;font-size:11px;" onclick="PdfPages.addBlankPage()" title="Add Blank Page">+ Blank</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;font-size:11px;" onclick="PdfPages.duplicatePage(window.pdfEditor.currentPage)" title="Duplicate Page">Duplicate</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;font-size:11px;" onclick="PdfPages.rotatePage(window.pdfEditor.currentPage, 90)" title="Rotate Page">Rotate</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;font-size:11px;color:var(--accent-red);" onclick="PdfPages.deletePage(window.pdfEditor.currentPage)" title="Delete Page">Delete</button>
+            </div>
+            <div class="sidebar-content-pane" id="thumbnails-pane">
+              <!-- Thumbnails rendered here -->
+            </div>
+          </aside>
+
+          <!-- Center Canvas Workspace -->
+          <div class="editor-canvas-workspace" id="editor-workspace">
+            <div class="pdf-pages-container" id="pages-container">
+              <!-- PDF Pages and Overlay Canvases injected dynamically -->
+            </div>
+
+            <div class="floating-zoom">
+              <button class="btn-icon" style="width:32px;height:32px;" onclick="window.pdfEditor.setZoom(window.pdfEditor.zoomScale - 0.2)">−</button>
+              <span class="zoom-level-label" id="zoom-level-float">100%</span>
+              <button class="btn-icon" style="width:32px;height:32px;" onclick="window.pdfEditor.setZoom(window.pdfEditor.zoomScale + 0.2)">+</button>
+            </div>
+          </div>
+
+          <!-- Right Sidebar (Properties Inspector) -->
+          <aside class="editor-sidebar-right" id="editor-sidebar-right">
+            <div class="inspector-header">
+              <span>Properties</span>
+            </div>
+            <div class="prop-section" id="inspector-properties">
+              <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:24px 0;">
+                Select an object on the canvas to inspect its font, color, border, and size.
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- 3. CONVERTER VIEW -->
+      <section class="view-panel" id="converter-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">PDF Conversion Center</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+            High-fidelity client-side format conversions. No files uploaded to any server.
+          </p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:16px;">
+            
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">PDF to Images (ZIP)</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Export every page as individual high-res PNG, JPG, or WebP packaged into a ZIP archive.
+              </p>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="PdfConverter.pdfToImages('png')">Export PNG</button>
+                <button class="btn btn-secondary btn-sm" onclick="PdfConverter.pdfToImages('jpg')">Export JPG</button>
+                <button class="btn btn-secondary btn-sm" onclick="PdfConverter.pdfToImages('webp')">Export WebP</button>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">Images to PDF</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Combine multiple JPG or PNG photos into a clean multi-page PDF document.
+              </p>
+              <button class="btn btn-primary btn-sm" onclick="triggerFilePicker('image/*', files => PdfConverter.imagesToPdf(files))">
+                Select Images
+              </button>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">PDF to Word (DOCX)</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Extracts formatted text blocks and structures them into a standard OpenXML DOCX file.
+              </p>
+              <button class="btn btn-primary btn-sm" onclick="PdfConverter.pdfToDocx()">
+                Convert to DOCX
+              </button>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">PDF to Excel (CSV)</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Extracts rows and tabular invoice/data entries into a clean comma-separated CSV spreadsheet.
+              </p>
+              <button class="btn btn-primary btn-sm" onclick="PdfConverter.pdfToExcel()">
+                Extract to CSV
+              </button>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">PDF to Plain Text (TXT)</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Extracts all raw textual content across pages into a searchable UTF-8 text file.
+              </p>
+              <button class="btn btn-secondary btn-sm" onclick="PdfConverter.pdfToText()">
+                Download .TXT
+              </button>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:8px;">Text / Note to PDF</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+                Convert notes, plain text, or pasted logs into a paginated PDF document.
+              </p>
+              <button class="btn btn-secondary btn-sm" onclick="const t = prompt('Enter or paste text to convert:'); if(t) PdfConverter.textToPdf(t, 'Document');">
+                Create from Text
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. COMPRESSOR VIEW -->
+      <section class="view-panel" id="compressor-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">PDF Compression Engine</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+            Accurately reduces PDF file weight by re-encoding canvas layers at optimized raster density.
+          </p>
+
+          <div class="glass-card" style="max-width:600px;margin:0 auto;">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px;">Select Compression Preset</div>
+
+            <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;margin-bottom:20px;">
+              <label style="border:1px solid var(--border-glass);padding:14px;border-radius:12px;cursor:pointer;text-align:center;">
+                <input type="radio" name="comp-level" value="low" style="margin-bottom:6px;">
+                <div style="font-weight:700;font-size:13px;">Low</div>
+                <div style="font-size:11px;color:var(--text-muted);">High Quality</div>
+              </label>
+              <label style="border:1px solid var(--primary);padding:14px;border-radius:12px;cursor:pointer;text-align:center;background:rgba(255,51,102,0.1);">
+                <input type="radio" name="comp-level" value="medium" checked style="margin-bottom:6px;">
+                <div style="font-weight:700;font-size:13px;">Medium</div>
+                <div style="font-size:11px;color:var(--text-muted);">Recommended</div>
+              </label>
+              <label style="border:1px solid var(--border-glass);padding:14px;border-radius:12px;cursor:pointer;text-align:center;">
+                <input type="radio" name="comp-level" value="high" style="margin-bottom:6px;">
+                <div style="font-weight:700;font-size:13px;">High</div>
+                <div style="font-size:11px;color:var(--text-muted);">Smallest Size</div>
+              </label>
+            </div>
+
+            <div id="compression-results" style="display:none;background:rgba(0,0,0,0.3);border-radius:12px;padding:16px;margin-bottom:20px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+                <span>Original File Size:</span>
+                <strong id="comp-orig-size">--</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+                <span>Compressed File Size:</span>
+                <strong id="comp-final-size" style="color:var(--accent-green);">--</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Reduction:</span>
+                <strong id="comp-reduction" style="color:var(--accent-blue);">--</strong>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;" id="start-compression-btn" onclick="runCompressionWorkflow()">
+              Run Compression
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. LOCAL OCR VIEW -->
+      <section class="view-panel" id="ocr-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">Local OCR & Text Recognition</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+            Recognizes and extracts readable text from scanned PDF pages and uploaded photo documents.
+          </p>
+
+          <div class="glass-card" style="max-width:700px;margin:0 auto;">
+            <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+              <select id="ocr-lang-select" class="prop-input" style="flex:1;">
+                <option value="eng">English (Latin Script) — Ready Offline</option>
+                <option value="ben">Bengali (বাংলা) — Glyphic & Token Analysis</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="runOcrWorkflow()">
+                Scan Active Page
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="triggerFilePicker('image/*', files => { const img = new Image(); img.onload = () => runImageOcrWorkflow(img); img.src = URL.createObjectURL(files[0]); })">
+                Scan Image File
+              </button>
+            </div>
+
+            <div id="ocr-warning-box" style="display:none;background:rgba(255,179,0,0.15);border:1px solid var(--accent-amber);color:var(--accent-amber);padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:14px;"></div>
+
+            <textarea id="ocr-output-text" class="prop-input" style="width:100%;height:220px;font-family:monospace;font-size:13px;line-height:1.5;resize:vertical;" placeholder="Recognized text will appear here..."></textarea>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
+              <button class="btn btn-secondary btn-sm" onclick="PdfOcr.copyText()">Copy Text</button>
+              <button class="btn btn-primary btn-sm" onclick="PdfOcr.exportTextFile()">Export as .TXT</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. OFFLINE AI ASSISTANT VIEW -->
+      <section class="view-panel" id="assistant-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">Offline Document Intelligence Assistant</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+            Rule-based algorithmic document analysis: extractive summarization, entity extraction, keywords, and readability metrics. (100% offline, zero external AI APIs).
+          </p>
+
+          <div style="text-align:center;margin-bottom:20px;">
+            <button class="btn btn-primary" onclick="runAssistantAnalysis()">Analyze Current Document</button>
+          </div>
+
+          <div id="assistant-results" style="display:none;max-width:850px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+            
+            <!-- Metrics Row -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:12px;">
+              <div class="glass-card" style="padding:14px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);">WORDS</div>
+                <div id="ast-words" style="font-size:20px;font-weight:800;color:var(--primary);margin-top:4px;">0</div>
+              </div>
+              <div class="glass-card" style="padding:14px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);">CHARACTERS</div>
+                <div id="ast-chars" style="font-size:20px;font-weight:800;color:var(--accent-blue);margin-top:4px;">0</div>
+              </div>
+              <div class="glass-card" style="padding:14px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);">READING TIME</div>
+                <div id="ast-readtime" style="font-size:20px;font-weight:800;color:var(--accent-green);margin-top:4px;">0 min</div>
+              </div>
+              <div class="glass-card" style="padding:14px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);">READABILITY</div>
+                <div id="ast-flesch" style="font-size:20px;font-weight:800;color:var(--accent-amber);margin-top:4px;">0/100</div>
+              </div>
+            </div>
+
+            <!-- Extractive Summary -->
+            <div class="glass-card">
+              <h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                <span>📌</span> Extractive Summary
+              </h3>
+              <p id="ast-summary" style="font-size:13px;line-height:1.6;color:var(--text-main);">--</p>
+            </div>
+
+            <!-- Key Terms & Entities -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="glass-card">
+                <h3 style="font-size:14px;margin-bottom:8px;">Top Keywords</h3>
+                <div id="ast-keywords" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              </div>
+              <div class="glass-card">
+                <h3 style="font-size:14px;margin-bottom:8px;">Identified Entities</h3>
+                <div id="ast-entities" style="font-size:12px;color:var(--text-main);line-height:1.6;"></div>
+              </div>
+            </div>
+
+            <!-- Grammar / Style Suggestions -->
+            <div class="glass-card">
+              <h3 style="font-size:14px;margin-bottom:8px;">Style & Readability Insights</h3>
+              <div id="ast-suggestions" style="font-size:12px;color:var(--text-muted);line-height:1.6;"></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. TRANSLATOR VIEW -->
+      <section class="view-panel" id="translator-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">PDF Translation Workspace</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+            Extracts source document text and formats translation into a new downloadable PDF. Note: Automatic offline glossary assists common terminology; manual translation ensures 100% privacy without external APIs.
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;margin:0 auto;">
+            <div class="glass-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <label style="font-size:13px;font-weight:700;">Source Document Text</label>
+                <button class="btn btn-secondary btn-sm" onclick="loadTranslatorSource()">Extract from PDF</button>
+              </div>
+              <textarea id="trans-source" class="prop-input" style="width:100%;height:280px;font-size:12px;line-height:1.5;resize:vertical;" placeholder="Click 'Extract from PDF' or paste text here..."></textarea>
+            </div>
+
+            <div class="glass-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <label style="font-size:13px;font-weight:700;">Target:</label>
+                  <select id="trans-target-lang" class="prop-input" style="padding:4px 8px;font-size:11px;">
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                  </select>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="applyGlossaryAuto()">Apply Glossary</button>
+              </div>
+              <textarea id="trans-target" class="prop-input" style="width:100%;height:280px;font-size:12px;line-height:1.5;resize:vertical;" placeholder="Enter or edit translated text here..."></textarea>
+              <div style="margin-top:12px;text-align:right;">
+                <button class="btn btn-primary btn-sm" onclick="PdfTranslator.compileTranslatedPdf(document.getElementById('trans-target').value, document.getElementById('trans-target-lang').value)">
+                  Compile Translated PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SECURITY & WATERMARK VIEW -->
+      <section class="view-panel" id="security-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">PDF Security & Metadata Studio</h2>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px;margin:0 auto;">
+            
+            <!-- Watermark -->
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:12px;">Add Watermark</h3>
+              <div class="prop-row">
+                <label class="prop-label">Watermark Text</label>
+                <input class="prop-input" type="text" id="sec-watermark-text" value="CONFIDENTIAL" style="width:160px;">
+              </div>
+              <div class="prop-row">
+                <label class="prop-label">Opacity (0.1 - 1.0)</label>
+                <input class="prop-input" type="number" id="sec-watermark-op" value="0.25" step="0.05" min="0.05" max="1" style="width:70px;">
+              </div>
+              <div class="prop-row">
+                <label class="prop-label">Color</label>
+                <input class="prop-input" type="color" id="sec-watermark-color" value="#ff3366" style="width:50px;height:30px;">
+              </div>
+              <button class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;" onclick="PdfSecurity.applyWatermark(document.getElementById('sec-watermark-text').value, parseFloat(document.getElementById('sec-watermark-op').value), 36, document.getElementById('sec-watermark-color').value); showView('editor-view');">
+                Apply Watermark to All Pages
+              </button>
+            </div>
+
+            <!-- Password Protect -->
+            <div class="glass-card">
+              <h3 style="font-size:16px;margin-bottom:12px;">Password Protection</h3>
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:14px;">
+                Locks document access with password encryption headers.
+              </p>
+              <div class="prop-row">
+                <label class="prop-label">Set Password</label>
+                <input class="prop-input" type="password" id="sec-pdf-pwd" placeholder="Enter password" style="width:160px;">
+              </div>
+              <button class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;" onclick="PdfSecurity.passwordProtectPdf(document.getElementById('sec-pdf-pwd').value)">
+                Protect & Download PDF
+              </button>
+            </div>
+
+            <!-- Metadata Editor -->
+            <div class="glass-card" style="grid-column:1/-1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h3 style="font-size:16px;">Document Metadata Inspector</h3>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-secondary btn-sm" onclick="loadDocMetadata()">Refresh</button>
+                  <button class="btn btn-secondary btn-sm" style="color:var(--accent-red);" onclick="PdfSecurity.stripMetadata()">Strip All Metadata</button>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="prop-row">
+                  <label class="prop-label">Title</label>
+                  <input class="prop-input" type="text" id="meta-title" style="flex:1;">
+                </div>
+                <div class="prop-row">
+                  <label class="prop-label">Author</label>
+                  <input class="prop-input" type="text" id="meta-author" style="flex:1;">
+                </div>
+                <div class="prop-row">
+                  <label class="prop-label">Subject</label>
+                  <input class="prop-input" type="text" id="meta-subject" style="flex:1;">
+                </div>
+                <div class="prop-row">
+                  <label class="prop-label">Keywords</label>
+                  <input class="prop-input" type="text" id="meta-keywords" placeholder="tag1, tag2" style="flex:1;">
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="margin-top:14px;" onclick="PdfSecurity.updateMetadata({ title: document.getElementById('meta-title').value, author: document.getElementById('meta-author').value, subject: document.getElementById('meta-subject').value, keywords: document.getElementById('meta-keywords').value })">
+                Save Metadata Changes
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. COMPARE VIEW -->
+      <section class="view-panel" id="compare-view">
+        <div class="scroll-content">
+          <div class="section-header">
+            <h2 class="section-title">PDF Comparison Engine</h2>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">
+            Select two PDF documents to compare page structure and highlight textual additions and deletions.
+          </p>
+
+          <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="triggerFilePicker('.pdf,application/pdf', f => { const r = new FileReader(); r.onload = e => { window.cmpBytes1 = e.target.result; window.cmpName1 = f[0].name; document.getElementById('cmp-file-label-1').textContent = f[0].name; checkRunCompare(); }; r.readAsArrayBuffer(f[0]); })">
+              Upload Document A
+            </button>
+            <span id="cmp-file-label-1" style="font-size:12px;color:var(--text-muted);align-self:center;">None selected</span>
+
+            <button class="btn btn-primary btn-sm" onclick="triggerFilePicker('.pdf,application/pdf', f => { const r = new FileReader(); r.onload = e => { window.cmpBytes2 = e.target.result; window.cmpName2 = f[0].name; document.getElementById('cmp-file-label-2').textContent = f[0].name; checkRunCompare(); }; r.readAsArrayBuffer(f[0]); })">
+              Upload Document B
+            </button>
+            <span id="cmp-file-label-2" style="font-size:12px;color:var(--text-muted);align-self:center;">None selected</span>
+          </div>
+
+          <div id="compare-dashboard" style="display:none;margin-top:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+              <div class="glass-card" style="text-align:center;">
+                <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Document A Preview</div>
+                <canvas id="compare-canvas-1" style="max-width:100%;height:auto;background:#fff;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.5);"></canvas>
+              </div>
+              <div class="glass-card" style="text-align:center;">
+                <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Document B Preview</div>
+                <canvas id="compare-canvas-2" style="max-width:100%;height:auto;background:#fff;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.5);"></canvas>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:15px;margin-bottom:12px;">Text Differences</h3>
+              <div id="compare-diff-output" style="font-size:13px;line-height:1.8;max-height:260px;overflow-y:auto;background:rgba(0,0,0,0.25);padding:14px;border-radius:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- SIGNATURE MODAL -->
+  <div class="modal-backdrop" id="signature-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Smart Signature Studio</div>
+        <button class="btn-icon" style="width:32px;height:32px;" onclick="document.getElementById('signature-modal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+          Draw smooth signature or upload an image. Notice: Visual signature stamp, not a PKI certificate.
+        </p>
+        
+        <div class="signature-canvas-container">
+          <canvas id="sig-canvas" width="540" height="200"></canvas>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+          <div style="display:flex;gap:6px;">
+            <input type="color" id="sig-pen-color" value="#000000" onchange="SmartSignatures.setPenColor(this.value)" style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;">
+            <button class="btn btn-secondary btn-sm" onclick="SmartSignatures.clear()">Clear</button>
+            <button class="btn btn-secondary btn-sm" onclick="triggerFilePicker('image/*', files => SmartSignatures.processUploadedSignatureImage(files[0]))">Upload Image</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="SmartSignatures.saveCurrentSignature()">Save Preset</button>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Saved Presets</div>
+          <div id="saved-signatures-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('signature-modal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="SmartSignatures.insertCurrentSignature()">Insert to Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAMP MODAL -->
+  <div class="modal-backdrop" id="stamp-modal">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-header">
+        <div class="modal-title">Official Stamps</div>
+        <button class="btn-icon" style="width:32px;height:32px;" onclick="document.getElementById('stamp-modal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <button class="btn btn-secondary" style="color:#00e676;border-color:#00e676;font-weight:800;" onclick="window.pdfEditor.addStamp('APPROVED'); document.getElementById('stamp-modal').classList.remove('active');">✓ APPROVED</button>
+          <button class="btn btn-secondary" style="color:#ff3366;border-color:#ff3366;font-weight:800;" onclick="window.pdfEditor.addStamp('CONFIDENTIAL'); document.getElementById('stamp-modal').classList.remove('active');">🔒 CONFIDENTIAL</button>
+          <button class="btn btn-secondary" style="color:#ffb300;border-color:#ffb300;font-weight:800;" onclick="window.pdfEditor.addStamp('DRAFT'); document.getElementById('stamp-modal').classList.remove('active');">📝 DRAFT</button>
+          <button class="btn btn-secondary" style="color:#ff5252;border-color:#ff5252;font-weight:800;" onclick="window.pdfEditor.addStamp('VOID'); document.getElementById('stamp-modal').classList.remove('active');">✕ VOID</button>
+          <button class="btn btn-secondary" style="color:#00d2fc;border-color:#00d2fc;font-weight:800;" onclick="window.pdfEditor.addStamp('COMPLETED'); document.getElementById('stamp-modal').classList.remove('active');">★ COMPLETED</button>
+          <button class="btn btn-secondary" style="color:#9b51e0;border-color:#9b51e0;font-weight:800;" onclick="window.pdfEditor.addStamp('REVISED'); document.getElementById('stamp-modal').classList.remove('active');">↻ REVISED</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR / BARCODE MODAL -->
+  <div class="modal-backdrop" id="code-modal">
+    <div class="modal-card" style="max-width:460px;">
+      <div class="modal-header">
+        <div class="modal-title">Generate QR / Barcode</div>
+        <button class="btn-icon" style="width:32px;height:32px;" onclick="document.getElementById('code-modal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="prop-row">
+          <label class="prop-label">Type</label>
+          <select id="code-type-select" class="prop-input" style="width:160px;">
+            <option value="qr">QR Code</option>
+            <option value="barcode">Barcode (Code 128)</option>
+          </select>
+        </div>
+        <div class="prop-row">
+          <label class="prop-label">Content Text</label>
+          <input class="prop-input" type="text" id="code-content-input" value="https://pdfstudio.local/doc/2026" style="width:100%;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('code-modal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="PdfTools.insertCodeToPdf(document.getElementById('code-type-select').value, document.getElementById('code-content-input').value); document.getElementById('code-modal').classList.remove('active'); showView('editor-view');">Insert to Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for Native / Browser File Selection -->
+  <input type="file" id="global-file-input" style="display:none;">
+
+  <!-- Library Scripts (All 100% Offline from assets/pdfstudio/vendor) -->
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/pdf.worker.min.js"></script>
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/samples.js"></script>
+  <script src="js/pdf-editor.js"></script>
+  <script src="js/pdf-pages.js"></script>
+  <script src="js/pdf-converter.js"></script>
+  <script src="js/pdf-compressor.js"></script>
+  <script src="js/pdf-ocr.js"></script>
+  <script src="js/pdf-assistant.js"></script>
+  <script src="js/pdf-translator.js"></script>
+  <script src="js/pdf-security.js"></script>
+  <script src="js/pdf-compare.js"></script>
+  <script src="js/pdf-signature.js"></script>
+  <script src="js/pdf-forms.js"></script>
+  <script src="js/pdf-tools.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Modal Helpers
+    function openSignatureModal() {
+      const modal = document.getElementById('signature-modal');
+      modal.classList.add('active');
+      SmartSignatures.renderSavedSignaturesList();
+    }
+    function openStampModal() {
+      document.getElementById('stamp-modal').classList.add('active');
+    }
+    function openCodeModal() {
+      document.getElementById('code-modal').classList.add('active');
+    }
+
+    // Workflows
+    async function runCompressionWorkflow() {
+      const level = document.querySelector('input[name="comp-level"]:checked').value;
+      const res = await PdfCompressor.compressDocument(level);
+      if (res) {
+        document.getElementById('compression-results').style.display = 'block';
+        document.getElementById('comp-orig-size').textContent = res.originalFormatted;
+        document.getElementById('comp-final-size').textContent = res.compressedFormatted;
+        document.getElementById('comp-reduction').textContent = `${res.reductionPercent}%`;
+
+        // Download
+        const fn = (window.pdfEditor ? window.pdfEditor.docName.replace(/\.pdf$/i, '') : 'Document') + '_compressed.pdf';
+        if (window.AndroidBridge) {
+          const b64 = window.pdfEditor.uint8ArrayToBase64(res.pdfBytes);
+          window.AndroidBridge.saveFile(b64, fn, 'application/pdf');
+        } else {
+          const blob = new Blob([res.pdfBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fn;
+          a.click();
+        }
+      }
+    }
+
+    async function runOcrWorkflow() {
+      const lang = document.getElementById('ocr-lang-select').value;
+      const res = await PdfOcr.processOcr('current-page', null, lang);
+      if (res) {
+        document.getElementById('ocr-output-text').value = res.text;
+        const wBox = document.getElementById('ocr-warning-box');
+        if (res.warning) {
+          wBox.style.display = 'block';
+          wBox.textContent = res.warning;
+        } else {
+          wBox.style.display = 'none';
+        }
+      }
+    }
+
+    async function runImageOcrWorkflow(img) {
+      const lang = document.getElementById('ocr-lang-select').value;
+      const res = await PdfOcr.processOcr('image', img, lang);
+      if (res) {
+        document.getElementById('ocr-output-text').value = res.text;
+      }
+    }
+
+    async function runAssistantAnalysis() {
+      const res = await PdfAssistant.analyzeDocument();
+      if (!res || res.isEmpty) {
+        alert(res ? res.message : 'No document loaded.');
+        return;
+      }
+      document.getElementById('assistant-results').style.display = 'flex';
+      document.getElementById('ast-words').textContent = res.metrics.words;
+      document.getElementById('ast-chars').textContent = res.metrics.characters;
+      document.getElementById('ast-readtime').textContent = res.metrics.readingTime;
+      document.getElementById('ast-flesch').textContent = `${res.metrics.readabilityScore}/100`;
+
+      document.getElementById('ast-summary').textContent = res.summary;
+
+      document.getElementById('ast-keywords').innerHTML = res.keywords.map(k => `
+        <span class="badge badge-info" style="font-size:12px;padding:4px 8px;">${k.word} (${k.freq})</span>
+      `).join('');
+
+      let entHtml = '';
+      if (res.entities.emails.length) entHtml += `<div><strong>Emails:</strong> ${res.entities.emails.join(', ')}</div>`;
+      if (res.entities.phones.length) entHtml += `<div><strong>Phones:</strong> ${res.entities.phones.join(', ')}</div>`;
+      if (res.entities.dates.length) entHtml += `<div><strong>Dates:</strong> ${res.entities.dates.join(', ')}</div>`;
+      if (res.entities.urls.length) entHtml += `<div><strong>URLs:</strong> ${res.entities.urls.join(', ')}</div>`;
+      if (!entHtml) entHtml = 'None detected';
+      document.getElementById('ast-entities').innerHTML = entHtml;
+
+      document.getElementById('ast-suggestions').innerHTML = res.suggestions.length ?
+        res.suggestions.map(s => `<div>• <strong>${s.type}:</strong> ${s.text}</div>`).join('') :
+        'No major spelling or stylistic issues found.';
+    }
+
+    async function loadTranslatorSource() {
+      const txt = await PdfTranslator.loadTextFromCurrentPdf();
+      document.getElementById('trans-source').value = txt;
+    }
+
+    function applyGlossaryAuto() {
+      const src = document.getElementById('trans-source').value;
+      const targetLang = document.getElementById('trans-target-lang').value;
+      const res = PdfTranslator.applyOfflineGlossary(src, 'en', targetLang);
+      document.getElementById('trans-target').value = res;
+    }
+
+    async function loadDocMetadata() {
+      const meta = await PdfSecurity.getMetadata();
+      if (meta) {
+        document.getElementById('meta-title').value = meta.title;
+        document.getElementById('meta-author').value = meta.author;
+        document.getElementById('meta-subject').value = meta.subject;
+        document.getElementById('meta-keywords').value = meta.keywords;
+      }
+    }
+
+    async function checkRunCompare() {
+      if (window.cmpBytes1 && window.cmpBytes2) {
+        document.getElementById('compare-dashboard').style.display = 'block';
+        const res = await PdfCompare.compareDocuments(window.cmpBytes1, window.cmpName1, window.cmpBytes2, window.cmpName2);
+        document.getElementById('compare-diff-output').innerHTML = res.diffHtml;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "PDF Studio",
+  "description": "Complete, professional offline PDF editor, converter, compressor, and scanner suite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
